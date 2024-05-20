@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 export default function SignupForm({ onLoginClick }) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         username: '',
@@ -20,12 +21,13 @@ export default function SignupForm({ onLoginClick }) {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/signup', formData);        
-            onLoginClick()
+            toast.success('Sign up successful! Please log in.');
+            navigate('/'); // Redirect to login page after successful signup
         } catch (error) {
             console.error(error.response.data);
+            toast.error('Failed to sign up. Please try again.');
         }
     };
-    
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xs">
@@ -79,6 +81,7 @@ export default function SignupForm({ onLoginClick }) {
                         <button
                             onClick={onLoginClick}
                             className="text-blue-500 hover:text-blue-700 font-bold"
+                            type="button" // Ensure it doesn't trigger form submission
                         >
                             Login
                         </button>

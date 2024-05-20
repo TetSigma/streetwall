@@ -5,11 +5,10 @@ import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from '../../features/auth/authSlice'; 
 import { useSelector } from 'react-redux';
-
-
+import Cookies from 'js-cookie';
 
 export default function LoginForm({ onSignupClick }) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     
     const user = useSelector((state) => state.auth.user);
@@ -27,11 +26,12 @@ export default function LoginForm({ onSignupClick }) {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/login', formData);
-            console.log(response.data)
+            console.log(response.data);
             const { token, user } = response.data;
 
-            localStorage.setItem('token', token);
-            toast.success('Logged in succesfully!')
+            // Store the token in a cookie instead of local storage
+            Cookies.set('jwtToken', token, { expires: 1 }); // Expires in 1 day
+            toast.success('Logged in successfully!');
 
             if (user) {
                 if (user !== null) {
@@ -40,9 +40,9 @@ export default function LoginForm({ onSignupClick }) {
                 dispatch(setUser(user));
             }
 
-            navigate('/api/dashboard')
+            navigate('/api/dashboard');
         } catch (error) {
-            toast.error('Invalid credentials, try again')
+            toast.error('Invalid credentials, try again');
         }
     };
 

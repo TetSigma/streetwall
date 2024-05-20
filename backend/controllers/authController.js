@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Cookies = require('cookies');
 
 exports.signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -36,7 +37,10 @@ exports.signup = async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: payload.user }); // Send token and user info to frontend
+        // Set the token as an HTTP-only cookie
+        const cookies = new Cookies(req, res);
+        cookies.set('jwtToken', token, { httpOnly: true, maxAge: 3600000 }); // 1 hour expiry
+        res.json({ user: payload.user }); // Send user info to frontend
       }
     );
   } catch (err) {
@@ -73,7 +77,10 @@ exports.login = async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: payload.user }); // Send token and user info to frontend
+        // Set the token as an HTTP-only cookie
+        const cookies = new Cookies(req, res);
+        cookies.set('jwtToken', token, { httpOnly: true, maxAge: 3600000 }); // 1 hour expiry
+        res.json({ user: payload.user }); // Send user info to frontend
       }
     );
   } catch (err) {
